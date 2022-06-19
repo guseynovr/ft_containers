@@ -1,3 +1,5 @@
 test.cpp
 .vscode
 .DS_Store
+tests/googletest
+tests/build
