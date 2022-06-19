@@ -1,6 +1,7 @@
 #ifndef ITERATOR_H
 #define ITERATOR_H
 
+// #include <iterator>
 namespace ft {
 
 struct input_iterator_tag {};
@@ -20,5 +21,12 @@ struct iterator {
 };
 
 template <class Iter>
+struct std::iterator_traits<youriterator> {        
+    typedef ???? difference_type; //almost always ptrdiff_t
+    typedef ???? value_type; //almost always T
+    typedef ???? reference; //almost always T& or const T&
+    typedef ???? pointer; //almost always T* or const T*
+    typedef ???? iterator_category;  //usually std::forward_iterator_tag or similar
+};
 
 } // namespace ft

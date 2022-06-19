@@ -2,7 +2,7 @@
 #define VECTOR_H
 
 #include <memory>
-#include <vector>
+// #include <vector>
 
 namespace ft {
 
@@ -85,17 +85,52 @@ public:
     allocator_type get_allocator() const;
 
 // Non-member function overloads
-    bool operator==(const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs);
-    bool operator!=(const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs);
-    bool operator< (const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs);
-    bool operator<=(const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs);
-    bool operator> (const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs);
-    bool operator>=(const std::vector<T,Alloc>& lhs, const std::vector<T,Alloc>& rhs);
-    template <class T, class Alloc>
-    void swap (vector<T,Alloc>& x, vector<T,Alloc>& y);
+    template <class U, class Alloc>
+    friend bool operator==(const std::vector<U,Alloc>& lhs, const std::vector<U,Alloc>& rhs);
+    template <class U, class Alloc>
+    friend bool operator!=(const std::vector<U,Alloc>& lhs, const std::vector<U,Alloc>& rhs);
+    template <class U, class Alloc>
+    friend bool operator< (const std::vector<U,Alloc>& lhs, const std::vector<U,Alloc>& rhs);
+    template <class U, class Alloc>
+    friend bool operator<=(const std::vector<U,Alloc>& lhs, const std::vector<U,Alloc>& rhs);
+    template <class U, class Alloc>
+    friend bool operator> (const std::vector<U,Alloc>& lhs, const std::vector<U,Alloc>& rhs);
+    template <class U, class Alloc>
+    friend bool operator>=(const std::vector<U,Alloc>& lhs, const std::vector<U,Alloc>& rhs);
+    template <class U, class Alloc>
+    friend void swap(vector<U,Alloc>& x, vector<U,Alloc>& y);
 
 private:
+    allocator_type alloc_;
+    pointer        begin_;
+    size_type      size_;
+    size_type      capacity_;
 };
+
+/* Constructors */
+template <class T, class Allocator>
+vector<T, Allocator>::vector(const allocator_type& alloc)
+    : alloc_(alloc)
+    , begin_(NULL)
+    , size_(0)
+    , capacity(0)
+{
+}
+
+template <class T, class Allocator>
+vector<T, Allocator>::vector(size_type n, const value_type& val, const allocator_type& alloc)
+    : alloc_(alloc)
+    , begin_(alloc.allocate(n))
+    , size_(0)
+    , capacity(n)
+{
+    while (size_ < n)
+        alloc.construct(begin_ + size_++, val)
+}
+// <class InputIterator>
+// vector(InputIterator first, InputIterator last,
+// const allocator_type& alloc = allocator_type());
+// vector(const vector& x);
 
 } // namespace ft
 
