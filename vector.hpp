@@ -199,6 +199,7 @@ void vector<T, Allocator>::resize(size_type n, value_type val)
 template <class T, class Allocator>
 void vector<T, Allocator>::reserve(size_type n)
 {
+    // TODO: dealloc memory on bad alloc
     if (n <= capacity_) {
         return;
     }
