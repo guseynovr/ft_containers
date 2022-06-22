@@ -17,10 +17,10 @@ enable_testing()
 add_executable(
     stl_test
     vector_test.cpp
-    stack_test.cpp
-    map_test.cpp
-    set_test.cpp
-    ../tree/tree.cpp
+    # stack_test.cpp
+    # map_test.cpp
+    # set_test.cpp
+    # ../tree/tree.cpp
 )
 
 target_link_libraries(
