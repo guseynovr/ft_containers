@@ -25,6 +25,7 @@
     {\
         ASSERT_NE(ft_begin, ft_end);\
         compare_fails += (*ft_begin != *std_begin);\
+        std::cout << "ft=" << *ft_begin << ", std=" << *std_begin << std::endl;\
     }\
 \
     EXPECT_EQ(compare_fails, 0);\

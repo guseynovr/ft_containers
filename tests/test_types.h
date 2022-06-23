@@ -468,31 +468,31 @@ struct SetDefines
 typedef ::testing::Types<
 //            |value            |gen                    |size
 VectorDefines< int,              IntGenerator,           0L >,
-VectorDefines< int,              IntGenerator,           1L >,
-VectorDefines< int,              IntGenerator,           2L >,
-VectorDefines< int,              IntGenerator,           3L >,
-VectorDefines< int,              IntGenerator               >,
-VectorDefines< std::string,      StringGenerator            >,
-VectorDefines< int,              IntSetRandomGenerator      >,
-VectorDefines< int,              IntRandomGenerator         >,
-VectorDefines< std::string,      StringRandomGenerator      >,
-VectorDefines< std_vec_int_type, svr_gen_type               >,
-VectorDefines< ft_vec_int_type,  fvr_gen_type               >
+VectorDefines< int,              IntGenerator,           1L >//,
+// VectorDefines< int,              IntGenerator,           2L >,
+// VectorDefines< int,              IntGenerator,           3L >,
+// VectorDefines< int,              IntGenerator               >,
+// VectorDefines< std::string,      StringGenerator            >,
+// VectorDefines< int,              IntSetRandomGenerator      >,
+// VectorDefines< int,              IntRandomGenerator         >,
+// VectorDefines< std::string,      StringRandomGenerator      >,
+// VectorDefines< std_vec_int_type, svr_gen_type               >,
+// VectorDefines< ft_vec_int_type,  fvr_gen_type               >
 >
 TestVectorTypes;
 
 typedef ::testing::Types<
 //         |key              |value |key_gen               |value_gen       |size
 MapDefines< int,              int,   IntGenerator,          IntGenerator,    0L >,
-MapDefines< int,              int,   IntGenerator,          IntGenerator,    1L >,
-MapDefines< int,              int,   IntGenerator,          IntGenerator,    2L >,
-MapDefines< int,              int,   IntGenerator,          IntGenerator,    3L >,
-MapDefines< int,              int,   IntGenerator,          IntGenerator        >, //1000 by default
-MapDefines< int,              float, IntGenerator,          FloatGenerator      >,
-MapDefines< std::string,      float, StringGenerator,       FloatGenerator      >,
-MapDefines< int,              int,   IntSetRandomGenerator, IntGenerator        >,
-MapDefines< int,              int,   IntRandomGenerator,    IntGenerator        >,
-MapDefines< std::string,      int,   StringRandomGenerator, IntGenerator        >//,
+MapDefines< int,              int,   IntGenerator,          IntGenerator,    1L >//,
+// MapDefines< int,              int,   IntGenerator,          IntGenerator,    2L >,
+// MapDefines< int,              int,   IntGenerator,          IntGenerator,    3L >,
+// MapDefines< int,              int,   IntGenerator,          IntGenerator        >, //1000 by default
+// MapDefines< int,              float, IntGenerator,          FloatGenerator      >,
+// MapDefines< std::string,      float, StringGenerator,       FloatGenerator      >,
+// MapDefines< int,              int,   IntSetRandomGenerator, IntGenerator        >,
+// MapDefines< int,              int,   IntRandomGenerator,    IntGenerator        >,
+// MapDefines< std::string,      int,   StringRandomGenerator, IntGenerator        >//,
 // MapDefines< std_map_int_type, int,   smr_gen_type,          IntGenerator        >,
 // MapDefines< ft_map_int_type,  int,   fmr_gen_type,          IntGenerator        >
 >
@@ -501,16 +501,16 @@ TestMapTypes;
 typedef ::testing::Types<
 //         |value            |gen                    |size
 SetDefines< int,              IntGenerator,           0L >,
-SetDefines< int,              IntGenerator,           1L >,
-SetDefines< int,              IntGenerator,           2L >,
-SetDefines< int,              IntGenerator,           3L >,
-SetDefines< int,              IntGenerator               >,
-SetDefines< std::string,      StringGenerator            >,
-SetDefines< int,              IntSetRandomGenerator      >,
-SetDefines< int,              IntRandomGenerator         >,
-SetDefines< std::string,      StringRandomGenerator      >,
-SetDefines< std_vec_int_type, svr_gen_type               >,
-SetDefines< ft_vec_int_type,  fvr_gen_type               >
+SetDefines< int,              IntGenerator,           1L >//,
+// SetDefines< int,              IntGenerator,           2L >,
+// SetDefines< int,              IntGenerator,           3L >,
+// SetDefines< int,              IntGenerator               >,
+// SetDefines< std::string,      StringGenerator            >,
+// SetDefines< int,              IntSetRandomGenerator      >,
+// SetDefines< int,              IntRandomGenerator         >,
+// SetDefines< std::string,      StringRandomGenerator      >//,
+// SetDefines< std_vec_int_type, svr_gen_type               >,
+// SetDefines< ft_vec_int_type,  fvr_gen_type               >
 >
 TestSetTypes;
 

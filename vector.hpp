@@ -34,7 +34,8 @@ public:
                     const allocator_type& alloc = allocator_type());
     template <class InputIterator>
              vector(InputIterator first, InputIterator last,
-                    const allocator_type& alloc = allocator_type());
+                    const allocator_type& alloc = allocator_type(),
+                    typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type = 0);
              vector(const vector& x);
 
     ~vector();
@@ -71,14 +72,18 @@ public:
 
 // Modifiers
     template <class InputIterator>
-    void     assign(InputIterator first, InputIterator last);
+    void     assign(InputIterator first, InputIterator last,
+                    typename std::enable_if<
+                    !std::is_integral<InputIterator>::value, bool>::type = 0);
     void     assign(size_type n, const value_type& val) { resize(n, val); }
     void     push_back(const value_type& val);
     void     pop_back();
     iterator insert(iterator position, const value_type& val);
     void     insert(iterator position, size_type n, const value_type& val);
     template <class InputIterator>
-    void     insert(iterator position, InputIterator first, InputIterator last);
+    void     insert(iterator position, InputIterator first, InputIterator last,
+                    typename std::enable_if<
+                    !std::is_integral<InputIterator>::value, bool>::type = 0);
     iterator erase (iterator position);
     iterator erase (iterator first, iterator last);
     void     swap  (vector& x);
@@ -131,19 +136,25 @@ vector<T, Allocator>::vector(size_type n, const value_type& val, const allocator
     , size_(0)
     , capacity_(n)
 {
-    while (size_ < n)
+    //printf("allocated %lu cap: %p\n", capacity_, begin_);
+    while (size_ < n) {
+        //printf("constructing 4 %p, size=%lu, n=%lu\n", begin_ + size_, size_, n);
         alloc_.construct(begin_ + size_++, val);
+    }
 }
 
 template <class T, class Allocator>
     template <class InputIterator>
-vector<T, Allocator>::vector(InputIterator first, InputIterator last, const allocator_type& alloc)
+vector<T, Allocator>::vector(InputIterator first, InputIterator last, const allocator_type& alloc,
+typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
     : alloc_(alloc)
     , begin_(alloc_.allocate(last - first))
     , size_(0)
     , capacity_(last - first)
 {
+    //printf("allocated %lu cap: %p\n", capacity_, begin_);
     for (; first != last; ++first, ++size_) {
+        //printf("constructing 5 %p\n", begin_ + size_);
         alloc_.construct(begin_ + size_, *first);
     }
 }
@@ -162,6 +173,8 @@ template <class T, class Allocator>
 vector<T, Allocator>::~vector()
 {
     clear();
+    //printf("destructor: capacity %lu, begin_: %p\n", capacity_, begin_);
+    //printf("deallocating %p\n", begin_);
     alloc_.deallocate(begin_, capacity_);
 }
 
@@ -173,9 +186,12 @@ vector<T, Allocator>& vector<T, Allocator>::operator=(const vector& other)
     clear();
     alloc_ = other.alloc_;
     if (capacity_ < other.capacity_) {
-       begin_ = alloc_.allocate(other.capacity_);
+        reserve(other.capacity_);
+        // begin_ = alloc_.allocate(other.capacity_);
+        // capacity_ = other.capacity_;
     }
     while (size_ < other.size_) {
+        //printf("constructing 6 %p\n", begin_ + size_);
         alloc_.construct(begin_ + size_, other[size_]);
         ++size_;
     }
@@ -192,6 +208,7 @@ void vector<T, Allocator>::resize(size_type n, value_type val)
     }
     reserve(n);
     while (size_ < n) {
+        //printf("constructing 7 %p\n", begin_ + size_);
         alloc_.construct(begin_ + size_++, val);
     }
 }
@@ -199,6 +216,7 @@ void vector<T, Allocator>::resize(size_type n, value_type val)
 template <class T, class Allocator>
 void vector<T, Allocator>::reserve(size_type n)
 {
+    //printf("old: begin_ %p, capacity_ %lu\n", begin_, capacity_);
     if (n <= capacity_) {
         return;
     }
@@ -207,11 +225,16 @@ void vector<T, Allocator>::reserve(size_type n)
     while (n > capacity_) capacity_ <<= 1;
     pointer old = begin_;
     begin_ = alloc_.allocate(capacity_);
+    //printf("allocated %lu cap: %p\n", capacity_, begin_);
     for (size_type i = 0; i < size_; ++i) {
         begin_[i] = old[i];
+        // printf("copied %i to %i\n", old[i], begin_[i]);
+        //printf("destroying %p\n", old + i);
         alloc_.destroy(old + i);
     }
+    //printf("deallocating %p\n", old);
     alloc_.deallocate(old, old_cap);
+    //printf("new: begin_ %p, capacity_ %lu\n", begin_, capacity_);
 }
 
 /***** Element access *****/
@@ -236,7 +259,8 @@ typename vector<T, Allocator>::const_reference vector<T, Allocator>::at(size_typ
 
 template <class T, class Allocator>
     template <class InputIterator>
-void vector<T, Allocator>::assign(InputIterator first, InputIterator last)
+void vector<T, Allocator>::assign(InputIterator first, InputIterator last,
+typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
 {
     resize(last - first);
     size_ = 0;
@@ -249,6 +273,7 @@ template <class T, class Allocator>
 void vector<T, Allocator>::push_back(const value_type& val)
 {
     reserve(size_ + 1);
+    //printf("constructing 8 %p\n", begin_ + size_);
     alloc_.construct(begin_ + size_++);
 }
 
@@ -264,34 +289,50 @@ template <class T, class Allocator>
 typename vector<T, Allocator>::iterator
 vector<T, Allocator>::insert(iterator position, const value_type& val)
 {
+    difference_type shift = position - begin();
+
     reserve(size_ + 1);
-    move_(position + 1, position, end() - position);
+    position = begin() + shift;
+    move_(begin() + shift + 1, begin() + shift, end() - position);
     ++size_;
+    //printf("constructing 1 %p\n", &*position);
     alloc_.construct(&*position, val);
 }
 
 template <class T, class Allocator>
 void vector<T, Allocator>::insert(iterator position, size_type n, const value_type& val)
 {
+    difference_type shift = position - begin();
+
     reserve(size_ + n);
+    position = begin() + shift;
     move_(position + n, position, end() - position);
     size_ += n;
     for (; n != 0; position++, --n) {
-        *position = val;
+        //printf("constructing 2 %p\n", &*position);
+        alloc_.construct(&*position, val);
     }
 }
 
 template <class T, class Allocator>
     template <class InputIterator>
-void vector<T, Allocator>::insert(iterator position, InputIterator first, InputIterator last)
+void vector<T, Allocator>::insert(iterator position, InputIterator first, InputIterator last,
+typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
 {
+    difference_type shift = position - begin();
     difference_type n = last - first;
 
+    // printf("first value before %i\n", *first);
     reserve(size_ + n);
+    // printf("first value after %i\n", *first);
+    position = begin() + shift;
+    // printf("first value for bef %i\n", *first);
     move_(position + n, position, end() - position);
     size_ += n;
     for (; first != last; ++first, ++position) {
-        *position = *first;
+        // printf("constructing 3 %p\n", &*position);
+        // printf("construct from value 3 %i\n", *first);
+        alloc_.construct(&*position, *first);
     }
 }
 
@@ -302,6 +343,7 @@ vector<T, Allocator>::erase(iterator position)
     alloc_.destroy(&*position);
     move_(position, position + 1, end() - position);
     --size_;
+    return position;
 }
 
 template <class T, class Allocator>
@@ -315,6 +357,7 @@ vector<T, Allocator>::erase(iterator first, iterator last)
     }
     move_(first, last, end() - last - 1);
     size_ -= n;
+    return first;
 }
 
 template <class T, class Allocator>
@@ -400,6 +443,7 @@ void vector<T, Allocator>::move_(iterator dst, iterator src, difference_type len
     } else {
         for (difference_type i = len - 1; i >= 0; --i) {
             *(dst + i) = *(src + i);;
+            // printf("value old %i, value copied %i\n",  *(dst + i), *(src + i));
         }
     }
 }

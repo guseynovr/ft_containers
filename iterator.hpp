@@ -70,7 +70,7 @@ public:
 
     ra_iter(pointer ptr) : ptr_(ptr) {}
     ra_iter(const ra_iter& rai) : ptr_(rai.ptr_) {}
-    ~ra_iter();
+    ~ra_iter() {}
 
     ra_iter& operator=(const ra_iter& rai) {
         if (this != &rai) {
