@@ -217,6 +217,7 @@ template <class T, class Allocator>
 void vector<T, Allocator>::reserve(size_type n)
 {
     //printf("old: begin_ %p, capacity_ %lu\n", begin_, capacity_);
+    // TODO: dealloc memory on bad alloc
     if (n <= capacity_) {
         return;
     }
