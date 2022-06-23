@@ -68,6 +68,7 @@ public:
     typedef typename iterator<random_access_iterator_tag, T>::pointer           pointer;
     typedef typename iterator<random_access_iterator_tag, T>::reference         reference;
 
+    ra_iter() : ptr_(NULL) {}
     ra_iter(pointer ptr) : ptr_(ptr) {}
     ra_iter(const ra_iter& rai) : ptr_(rai.ptr_) {}
     ~ra_iter() {}

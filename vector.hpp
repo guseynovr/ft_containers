@@ -298,6 +298,7 @@ vector<T, Allocator>::insert(iterator position, const value_type& val)
     ++size_;
     //printf("constructing 1 %p\n", &*position);
     alloc_.construct(&*position, val);
+    return position;
 }
 
 template <class T, class Allocator>
