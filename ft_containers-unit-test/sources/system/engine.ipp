@@ -5,7 +5,7 @@
 #define _CXX "/usr/bin/clang++"
 #define _CXX_FLAGS "-Wall -Wextra -Werror"
 #define _EXEC_NAME "test1"
-#define _ALARM_TIMEOUT 20
+#define _ALARM_TIMEOUT 200
 #define _VECTOR_TEST_NUM 36
 #define _STACK_TEST_NUM 12
 #define _UTILITIES_TEST_NUM 5

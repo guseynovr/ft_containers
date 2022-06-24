@@ -16,6 +16,15 @@ int run_vector_unit_test(std::string test_name, std::vector<int> (func1)(std::ve
 	printElement(test_name);
 	res1 = func1(vector);
 	res2 = func2(my_vector);
+
+    //my additiion
+    // std::vector<int>::iterator it1 = res1.begin();
+    // std::vector<int>::iterator it2 = res2.begin();
+    // for (; it1 != res1.end() && it2 != res2.end(); ++it1, ++it2) {
+    //     printf("val1 = %i, val2 = %i\n", *it1, *it2);
+    // }
+    //end addition
+
 	if (res1 == res2) {
 	    printElement("OK");
 	    result = 0;

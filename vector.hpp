@@ -114,9 +114,9 @@ private:
     size_type      size_;
     size_type      capacity_;
 
-    void move_(iterator dst, iterator src, difference_type len);
+    void    move_(pointer dst, pointer src, difference_type len);
+    void    destroy_();
 };
-
 
 /***** Constructors *****/
 
@@ -136,9 +136,7 @@ vector<T, Allocator>::vector(size_type n, const value_type& val, const allocator
     , size_(0)
     , capacity_(n)
 {
-    //printf("allocated %lu cap: %p\n", capacity_, begin_);
     while (size_ < n) {
-        //printf("constructing 4 %p, size=%lu, n=%lu\n", begin_ + size_, size_, n);
         alloc_.construct(begin_ + size_++, val);
     }
 }
@@ -152,10 +150,14 @@ typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
     , size_(0)
     , capacity_(last - first)
 {
-    //printf("allocated %lu cap: %p\n", capacity_, begin_);
     for (; first != last; ++first, ++size_) {
-        //printf("constructing 5 %p\n", begin_ + size_);
-        alloc_.construct(begin_ + size_, *first);
+        try {
+            alloc_.construct(begin_ + size_, *first);
+        }
+        catch (...) {
+            destroy_();
+            throw;
+        }
     }
 }
 
@@ -172,10 +174,7 @@ vector<T, Allocator>::vector(const vector& x)
 template <class T, class Allocator>
 vector<T, Allocator>::~vector()
 {
-    clear();
-    //printf("destructor: capacity %lu, begin_: %p\n", capacity_, begin_);
-    //printf("deallocating %p\n", begin_);
-    alloc_.deallocate(begin_, capacity_);
+    destroy_();
 }
 
 template <class T, class Allocator>
@@ -185,13 +184,8 @@ vector<T, Allocator>& vector<T, Allocator>::operator=(const vector& other)
         return *this;
     clear();
     alloc_ = other.alloc_;
-    if (capacity_ < other.capacity_) {
-        reserve(other.capacity_);
-        // begin_ = alloc_.allocate(other.capacity_);
-        // capacity_ = other.capacity_;
-    }
+    reserve(other.size_);
     while (size_ < other.size_) {
-        //printf("constructing 6 %p\n", begin_ + size_);
         alloc_.construct(begin_ + size_, other[size_]);
         ++size_;
     }
@@ -208,7 +202,6 @@ void vector<T, Allocator>::resize(size_type n, value_type val)
     }
     reserve(n);
     while (size_ < n) {
-        //printf("constructing 7 %p\n", begin_ + size_);
         alloc_.construct(begin_ + size_++, val);
     }
 }
@@ -216,26 +209,27 @@ void vector<T, Allocator>::resize(size_type n, value_type val)
 template <class T, class Allocator>
 void vector<T, Allocator>::reserve(size_type n)
 {
-    //printf("old: begin_ %p, capacity_ %lu\n", begin_, capacity_);
-    // TODO: dealloc memory on bad alloc
     if (n <= capacity_) {
         return;
     }
     size_type old_cap = capacity_;
-    if (capacity_ == 0) capacity_ = 1;
-    while (n > capacity_) capacity_ <<= 1;
+    if (capacity_ && n < capacity_ << 1) capacity_ <<= 1;
+    else capacity_ = n;
     pointer old = begin_;
-    begin_ = alloc_.allocate(capacity_);
-    //printf("allocated %lu cap: %p\n", capacity_, begin_);
+    try {
+        begin_ = alloc_.allocate(capacity_);
+    }
+    catch (std::bad_alloc& e) {
+        destroy_();
+        throw;
+    }
     for (size_type i = 0; i < size_; ++i) {
         begin_[i] = old[i];
-        // printf("copied %i to %i\n", old[i], begin_[i]);
-        //printf("destroying %p\n", old + i);
         alloc_.destroy(old + i);
     }
-    //printf("deallocating %p\n", old);
+    // printf("old %p\n", old);
     alloc_.deallocate(old, old_cap);
-    //printf("new: begin_ %p, capacity_ %lu\n", begin_, capacity_);
+    // printf("ok\n");
 }
 
 /***** Element access *****/
@@ -266,7 +260,8 @@ typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
     resize(last - first);
     size_ = 0;
     while (first != last) {
-        begin_[size_++] = *first++;
+        begin_[size_++] = *first;
+        ++first;
     }
 }
 
@@ -274,8 +269,7 @@ template <class T, class Allocator>
 void vector<T, Allocator>::push_back(const value_type& val)
 {
     reserve(size_ + 1);
-    //printf("constructing 8 %p\n", begin_ + size_);
-    alloc_.construct(begin_ + size_++);
+    alloc_.construct(begin_ + size_++, val);
 }
 
 template <class T, class Allocator>
@@ -290,29 +284,27 @@ template <class T, class Allocator>
 typename vector<T, Allocator>::iterator
 vector<T, Allocator>::insert(iterator position, const value_type& val)
 {
-    difference_type shift = position - begin();
+    difference_type shift = &*position - begin_;
 
     reserve(size_ + 1);
-    position = begin() + shift;
-    move_(begin() + shift + 1, begin() + shift, end() - position);
+    pointer pos = begin_ + shift;
+    move_(pos + 1, pos, size_ - shift);
     ++size_;
-    //printf("constructing 1 %p\n", &*position);
-    alloc_.construct(&*position, val);
-    return position;
+    alloc_.construct(pos, val);
+    return iterator(pos);
 }
 
 template <class T, class Allocator>
 void vector<T, Allocator>::insert(iterator position, size_type n, const value_type& val)
 {
-    difference_type shift = position - begin();
+    difference_type shift = &*position - begin_;
 
     reserve(size_ + n);
-    position = begin() + shift;
-    move_(position + n, position, end() - position);
+    pointer pos = begin_ + shift;
+    move_(pos + n, pos, size_ - shift);
     size_ += n;
-    for (; n != 0; position++, --n) {
-        //printf("constructing 2 %p\n", &*position);
-        alloc_.construct(&*position, val);
+    for (; n != 0; pos++, --n) {
+        alloc_.construct(pos, val);
     }
 }
 
@@ -321,20 +313,21 @@ template <class T, class Allocator>
 void vector<T, Allocator>::insert(iterator position, InputIterator first, InputIterator last,
 typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
 {
-    difference_type shift = position - begin();
+    difference_type shift = &*position - begin_;
     difference_type n = last - first;
 
-    // printf("first value before %i\n", *first);
     reserve(size_ + n);
-    // printf("first value after %i\n", *first);
-    position = begin() + shift;
-    // printf("first value for bef %i\n", *first);
-    move_(position + n, position, end() - position);
+    pointer pos = begin_ + shift;
+    move_(pos + n, pos, size_ - shift);
     size_ += n;
-    for (; first != last; ++first, ++position) {
-        // printf("constructing 3 %p\n", &*position);
-        // printf("construct from value 3 %i\n", *first);
-        alloc_.construct(&*position, *first);
+    for (; first != last; ++first, ++pos) {
+        try {
+            alloc_.construct(pos,  *first);
+        }
+        catch (...) {
+            destroy_();
+            throw;
+        }
     }
 }
 
@@ -342,8 +335,10 @@ template <class T, class Allocator>
 typename vector<T, Allocator>::iterator
 vector<T, Allocator>::erase(iterator position)
 {
-    alloc_.destroy(&*position);
-    move_(position, position + 1, end() - position);
+    pointer pos = &*position;
+
+    alloc_.destroy(pos);
+    move_(pos, pos + 1, end() - position);
     --size_;
     return position;
 }
@@ -357,7 +352,7 @@ vector<T, Allocator>::erase(iterator first, iterator last)
     for (iterator it = first; it != last; ++it) {
         alloc_.destroy(&*first);
     }
-    move_(first, last, end() - last - 1);
+    move_(&*first, &*first + n, end() - last - 1);
     size_ -= n;
     return first;
 }
@@ -435,19 +430,44 @@ inline void swap(vector<U,Alloc>& x, vector<U,Alloc>& y)
 
 /***** private *****/
 
+// template <class T, class Allocator>
+// void vector<T, Allocator>::move_(iterator dst, iterator src, difference_type len)
+// {
+//     if (dst < src) {
+//         for (difference_type i = 0; i < len; ++i) {
+//             *(dst + i) = *(src + i);
+//         }
+//     } else {
+//         for (difference_type i = len - 1; i >= 0; --i) {
+//             *(dst + i) = *(src + i);;
+//             // printf("value old %i, value copied %i\n",  *(dst + i), *(src + i));
+//         }
+//     }
+// }
+
 template <class T, class Allocator>
-void vector<T, Allocator>::move_(iterator dst, iterator src, difference_type len)
+void vector<T, Allocator>::move_(pointer dst, pointer src, difference_type len)
 {
-    if (dst < src) {
+        if (dst < src) {
         for (difference_type i = 0; i < len; ++i) {
-            *(dst + i) = *(src + i);
+            dst[i] = src[i];
         }
     } else {
         for (difference_type i = len - 1; i >= 0; --i) {
-            *(dst + i) = *(src + i);;
-            // printf("value old %i, value copied %i\n",  *(dst + i), *(src + i));
+            dst[i] = src[i];
         }
     }
+}
+
+template <class T, class Allocator>
+void vector<T, Allocator>::destroy_()
+{
+    clear();
+    // printf("destroying\t%p\n", begin_);
+    alloc_.deallocate(begin_, capacity_);
+    // printf("destroyed\t%p\n", begin_);
+    begin_ = NULL;
+    capacity_ = 0;
 }
 
 }; // namespace ft
