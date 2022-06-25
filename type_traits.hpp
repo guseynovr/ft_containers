@@ -1,5 +1,5 @@
-#ifndef TYPE_TRAITS
-#define TYPE_TRAITS
+#ifndef TYPE_TRAITS_H
+#define TYPE_TRAITS_H
 
 namespace ft {
 
@@ -43,4 +43,4 @@ template<> struct is_integral<unsigned long long> : public true_type { };
 
 }; // namespace ft
 
-#endif // TYPE_TRAITS
+#endif // TYPE_TRAITS_H
