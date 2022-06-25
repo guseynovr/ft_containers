@@ -14,14 +14,14 @@
 #include <vector>
 #include "../vector.hpp"
 
-// #include <map>
-// #include "../map.hpp"
+#include <map>
+#include "../map.hpp"
 
-// #include <set>
-// #include "../set.hpp"
+#include <set>
+#include "../set.hpp"
 
-// #include <stack>
-// #include "../stack.hpp"
+#include <stack>
+#include "../stack.hpp"
 
 namespace TestTypes
 {
@@ -475,9 +475,9 @@ VectorDefines< int,              IntGenerator               >,
 VectorDefines< std::string,      StringGenerator            >,
 VectorDefines< int,              IntSetRandomGenerator      >,
 VectorDefines< int,              IntRandomGenerator         >,
-VectorDefines< std::string,      StringRandomGenerator      >//,
-// VectorDefines< std_vec_int_type, svr_gen_type               >,
-// VectorDefines< ft_vec_int_type,  fvr_gen_type               >
+VectorDefines< std::string,      StringRandomGenerator      >,
+VectorDefines< std_vec_int_type, svr_gen_type               >,
+VectorDefines< ft_vec_int_type,  fvr_gen_type               >
 >
 TestVectorTypes;
 
@@ -508,9 +508,9 @@ SetDefines< int,              IntGenerator               >,
 SetDefines< std::string,      StringGenerator            >,
 SetDefines< int,              IntSetRandomGenerator      >,
 SetDefines< int,              IntRandomGenerator         >,
-SetDefines< std::string,      StringRandomGenerator      >//,
-// SetDefines< std_vec_int_type, svr_gen_type               >,
-// SetDefines< ft_vec_int_type,  fvr_gen_type               >
+SetDefines< std::string,      StringRandomGenerator      >,
+SetDefines< std_vec_int_type, svr_gen_type               >,
+SetDefines< ft_vec_int_type,  fvr_gen_type               >
 >
 TestSetTypes;
 

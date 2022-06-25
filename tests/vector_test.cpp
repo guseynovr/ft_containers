@@ -29,7 +29,6 @@
 \
     EXPECT_EQ(compare_fails, 0);\
 }
-// std::cout << "ft=" << *ft_begin << ", std=" << *std_begin << std::endl;\
 
 /// fixture
 
