@@ -6,7 +6,6 @@
 #include "iterator.hpp"
 #include "algorithm.hpp"
 #include "type_traits.hpp"
-// #include <vector>
 
 namespace ft {
 
@@ -198,7 +197,6 @@ vector<T, Allocator>& vector<T, Allocator>::operator=(const vector& other)
 template <class T, class Allocator>
 void vector<T, Allocator>::resize(size_type n, value_type val)
 {
-    // std::cout << "before n = " << n << ", size_ = " << size_ << std::endl;
     while (n < size_) {
         alloc_.destroy(begin_ + --size_);
     }
@@ -206,7 +204,6 @@ void vector<T, Allocator>::resize(size_type n, value_type val)
     while (size_ < n) {
         alloc_.construct(begin_ + size_++, val);
     }
-    // std::cout << "after size_ = " << size_ << std::endl;
 }
 
 template <class T, class Allocator>
@@ -255,24 +252,18 @@ template <class T, class Allocator>
 void vector<T, Allocator>::assign(InputIterator first, InputIterator last,
 typename ft::enable_if<!ft::is_integral<InputIterator>::value, bool>::type)
 {
-    // std::cout << "before n = " << last - first << ", size_ = " << size_ << std::endl;
     resize(last - first);
     size_ = 0;
     while (first != last) {
         begin_[size_++] = *first;
         ++first;
     }
-    // std::cout << "after size_ = " << size_ << std::endl;
 }
 
 template <class T, class Allocator>
 void vector<T, Allocator>::push_back(const value_type& val)
 {
-    // std::cout << "push_back";
-    // std::cout.flush();
     reserve(size_ + 1);
-    // std::cout << "\tstill ok\n";
-    // std::cout.flush();
     alloc_.construct(begin_ + size_++, val);
 }
 
@@ -303,13 +294,8 @@ void vector<T, Allocator>::insert(iterator position, size_type n, const value_ty
 {
     difference_type shift = &*position - begin_;
 
-    // std::cout << "insert\t";
-    // std::cout.flush();
     reserve(size_ + n);
-    // std::cout << "ok\n";
-    // std::cout.flush();
     pointer pos = begin_ + shift;
-    // pointer pos =  &*position;
     move_(pos + n, pos, size_ - shift);
     size_ += n;
     for (; n != 0; pos++, --n) {
@@ -358,7 +344,7 @@ vector<T, Allocator>::erase(iterator first, iterator last)
     difference_type n = last - first;
 
     for (iterator it = first; it != last; ++it) {
-        alloc_.destroy(&*first);
+        alloc_.destroy(&*it);
     }
     move_(&*first, &*first + n, end() - last - 1);
     size_ -= n;
@@ -404,12 +390,6 @@ inline bool operator!=(const vector<U,Alloc>& lhs, const vector<U,Alloc>& rhs)
 template <class U, class Alloc>
 inline bool operator< (const vector<U,Alloc>& lhs, const vector<U,Alloc>& rhs)
 {
-    // int i = 0;
-    // for (; i < lhs.size_ && i < rhs.size_; ++i) {
-    //     if (lhs[i] < rhs[i]) return true;
-    //     if (rhs[i] < lhs[i]) return false;
-    // }
-    // return (lhs.size_ < rhs.size_);
     return ft::lexicographical_compare(lhs.begin(), lhs.end(),
                                        rhs.begin(), rhs.end());
 }
@@ -445,13 +425,11 @@ inline void vector<T, Allocator>::move_(pointer dst, pointer src, difference_typ
 {
     if (dst < src) {
         for (difference_type i = 0; i < len; ++i) {
-            // dst[i] = src[i];
             alloc_.construct(dst + i, src[i]);
             alloc_.destroy(src + i);
         }
-    } else {
+    } else if (dst > src) {
         for (difference_type i = len - 1; i >= 0; --i) {
-            // dst[i] = src[i];
             alloc_.construct(dst + i, src[i]);
             alloc_.destroy(src + i);
         }

@@ -25,11 +25,11 @@
     {\
         ASSERT_NE(ft_begin, ft_end);\
         compare_fails += (*ft_begin != *std_begin);\
-        std::cout << " ft=" << *ft_begin << "\nstd=" << *std_begin << "\n>>>\n";\
     }\
 \
     EXPECT_EQ(compare_fails, 0);\
 }
+        // std::cout << " ft=" << *ft_begin << "\nstd=" << *std_begin << "\n>>>\n";\
 
 /// fixture
 
@@ -362,7 +362,6 @@ TYPED_TEST_P(VectorTest, InsertFill)
     this->std_vec.insert(this->std_vec.begin(), 0, this->gen.get());
     this->ft_vec.insert(this->ft_vec.begin(), 0, this->gen.get());
 
-    std::cout << "first compare\n";
     COMPARE_TEST(this->ft_vec, this->std_vec);
 
     this->std_vec.insert(this->std_vec.begin(),
@@ -370,7 +369,6 @@ TYPED_TEST_P(VectorTest, InsertFill)
     this->ft_vec.insert(this->ft_vec.begin(),
         TestFixture::size, this->gen.get());
 
-    std::cout << "last compare\n";
     COMPARE_TEST(this->ft_vec, this->std_vec);
 }
 
