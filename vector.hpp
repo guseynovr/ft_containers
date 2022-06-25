@@ -5,6 +5,7 @@
 
 #include "iterator.hpp"
 #include "algorithm.hpp"
+#include "type_traits.hpp"
 // #include <vector>
 
 namespace ft {
@@ -35,7 +36,7 @@ public:
     template <class InputIterator>
              vector(InputIterator first, InputIterator last,
                     const allocator_type& alloc = allocator_type(),
-                    typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type = 0);
+                    typename ft::enable_if<!ft::is_integral<InputIterator>::value, bool>::type = 0);
              vector(const vector& x);
 
     ~vector();
@@ -73,8 +74,8 @@ public:
 // Modifiers
     template <class InputIterator>
     void     assign(InputIterator first, InputIterator last,
-                    typename std::enable_if<
-                    !std::is_integral<InputIterator>::value, bool>::type = 0);
+                    typename ft::enable_if<
+                    !ft::is_integral<InputIterator>::value, bool>::type = 0);
     void     assign(size_type n, const value_type& val) { resize(n, val); }
     void     push_back(const value_type& val);
     void     pop_back();
@@ -82,8 +83,8 @@ public:
     void     insert(iterator position, size_type n, const value_type& val);
     template <class InputIterator>
     void     insert(iterator position, InputIterator first, InputIterator last,
-                    typename std::enable_if<
-                    !std::is_integral<InputIterator>::value, bool>::type = 0);
+                    typename ft::enable_if<
+                    !ft::is_integral<InputIterator>::value, bool>::type = 0);
     iterator erase (iterator position);
     iterator erase (iterator first, iterator last);
     void     swap  (vector& x);
@@ -144,7 +145,7 @@ vector<T, Allocator>::vector(size_type n, const value_type& val, const allocator
 template <class T, class Allocator>
     template <class InputIterator>
 vector<T, Allocator>::vector(InputIterator first, InputIterator last, const allocator_type& alloc,
-typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
+typename ft::enable_if<!ft::is_integral<InputIterator>::value, bool>::type)
     : alloc_(alloc)
     , begin_(alloc_.allocate(last - first))
     , size_(0)
@@ -227,9 +228,7 @@ void vector<T, Allocator>::reserve(size_type n)
         begin_[i] = old[i];
         alloc_.destroy(old + i);
     }
-    // printf("old %p\n", old);
     alloc_.deallocate(old, old_cap);
-    // printf("ok\n");
 }
 
 /***** Element access *****/
@@ -255,7 +254,7 @@ typename vector<T, Allocator>::const_reference vector<T, Allocator>::at(size_typ
 template <class T, class Allocator>
     template <class InputIterator>
 void vector<T, Allocator>::assign(InputIterator first, InputIterator last,
-typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
+typename ft::enable_if<!ft::is_integral<InputIterator>::value, bool>::type)
 {
     resize(last - first);
     size_ = 0;
@@ -311,7 +310,7 @@ void vector<T, Allocator>::insert(iterator position, size_type n, const value_ty
 template <class T, class Allocator>
     template <class InputIterator>
 void vector<T, Allocator>::insert(iterator position, InputIterator first, InputIterator last,
-typename std::enable_if<!std::is_integral<InputIterator>::value, bool>::type)
+typename ft::enable_if<!ft::is_integral<InputIterator>::value, bool>::type)
 {
     difference_type shift = &*position - begin_;
     difference_type n = last - first;
@@ -338,7 +337,7 @@ vector<T, Allocator>::erase(iterator position)
     pointer pos = &*position;
 
     alloc_.destroy(pos);
-    move_(pos, pos + 1, end() - position);
+    move_(pos, pos + 1, begin_ + size_ - pos);
     --size_;
     return position;
 }
@@ -396,12 +395,14 @@ inline bool operator!=(const vector<U,Alloc>& lhs, const vector<U,Alloc>& rhs)
 template <class U, class Alloc>
 inline bool operator< (const vector<U,Alloc>& lhs, const vector<U,Alloc>& rhs)
 {
-    int i = 0;
-    for (; i < lhs.size_ && i < rhs.size_; ++i) {
-        if (lhs[i] < rhs[i]) return true;
-        if (rhs[i] < lhs[i]) return false;
-    }
-    return (lhs.size_ < rhs.size_);
+    // int i = 0;
+    // for (; i < lhs.size_ && i < rhs.size_; ++i) {
+    //     if (lhs[i] < rhs[i]) return true;
+    //     if (rhs[i] < lhs[i]) return false;
+    // }
+    // return (lhs.size_ < rhs.size_);
+    return ft::lexicographical_compare(lhs.begin(), lhs.end(),
+                                       rhs.begin(), rhs.end());
 }
 
 template <class U, class Alloc>
@@ -430,25 +431,10 @@ inline void swap(vector<U,Alloc>& x, vector<U,Alloc>& y)
 
 /***** private *****/
 
-// template <class T, class Allocator>
-// void vector<T, Allocator>::move_(iterator dst, iterator src, difference_type len)
-// {
-//     if (dst < src) {
-//         for (difference_type i = 0; i < len; ++i) {
-//             *(dst + i) = *(src + i);
-//         }
-//     } else {
-//         for (difference_type i = len - 1; i >= 0; --i) {
-//             *(dst + i) = *(src + i);;
-//             // printf("value old %i, value copied %i\n",  *(dst + i), *(src + i));
-//         }
-//     }
-// }
-
 template <class T, class Allocator>
-void vector<T, Allocator>::move_(pointer dst, pointer src, difference_type len)
+inline void vector<T, Allocator>::move_(pointer dst, pointer src, difference_type len)
 {
-        if (dst < src) {
+    if (dst < src) {
         for (difference_type i = 0; i < len; ++i) {
             dst[i] = src[i];
         }
@@ -460,16 +446,26 @@ void vector<T, Allocator>::move_(pointer dst, pointer src, difference_type len)
 }
 
 template <class T, class Allocator>
-void vector<T, Allocator>::destroy_()
+inline void vector<T, Allocator>::destroy_()
 {
     clear();
-    // printf("destroying\t%p\n", begin_);
     alloc_.deallocate(begin_, capacity_);
-    // printf("destroyed\t%p\n", begin_);
     begin_ = NULL;
     capacity_ = 0;
 }
 
 }; // namespace ft
+
+namespace std {
+	template <class T, class A>
+	void swap(ft::vector<T, A> &v1, ft::vector<T, A> &v2 ) {
+		v1.swap(v2);
+	}
+
+	// template <class Key, class T, class Compare, class A>
+	// void swap(ft::Map<Key, T, Compare, A> &m1, ft::Map<Key, T, Compare, A> &m2 ) {
+	// 	m1.swap(m2);
+	// }
+}; //namespace std
 
 #endif // VECTOR_H
