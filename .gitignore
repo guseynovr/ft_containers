@@ -4,3 +4,4 @@
 tests/googletest
 tests/build
 a.out
+ft_containers-unit-test/logs.txt
