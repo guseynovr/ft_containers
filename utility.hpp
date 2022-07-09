@@ -53,7 +53,6 @@ template <class T1, class T2> struct pair
         { return !(lhs < rhs); }
 };
 
-// make_pair
 template <class T1,class T2>
 pair<T1,T2> make_pair(T1 x, T2 y)
 {
@@ -62,4 +61,4 @@ pair<T1,T2> make_pair(T1 x, T2 y)
 
 }; // namespace ft
 
-#endif //UTILITY_H
+#endif // UTILITY_H
