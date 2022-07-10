@@ -1,11 +1,10 @@
-#ifndef SET_H_
-#define SET_H_
+#ifndef SET_H
+#define SET_H
 
 #include "tree.hpp"
 #include "utility.hpp"
 
-namespace ft
-{
+namespace ft {
 
 template <class Key, class Compare = ft::less<Key>,
           class Allocator = std::allocator<Key> >
@@ -54,177 +53,119 @@ public:
     {}
 
     /// copy
-    set (const set& x)
-        : _tree(x._tree)
-    {}
+    set (const set& x) : _tree(x._tree) {}
 
     ~set() {}
 
 public:
-    set&
-    operator=(const set& other)
+    set& operator=(const set& other)
     {
         if (this != &other)
             _tree = other._tree;
         return *this;
     }
 
-    allocator_type
-    get_allocator() const
-    { return allocator_type(); }
+    allocator_type get_allocator() const { return allocator_type(); }
 
     /// iterators
-    iterator
-    begin()
-    { return _tree.begin(); }
+    iterator begin() { return _tree.begin(); }
 
-    const_iterator
-    begin() const
-    { return _tree.begin(); }
+    const_iterator begin() const { return _tree.begin(); }
 
-    iterator
-    end()
-    { return _tree.end(); }
+    iterator end() { return _tree.end(); }
 
-    const_iterator
-    end() const
-    { return _tree.end(); }
+    const_iterator end() const { return _tree.end(); }
 
-    reverse_iterator
-    rbegin()
-    { return _tree.rbegin(); }
+    reverse_iterator rbegin() { return _tree.rbegin(); }
 
-    const_reverse_iterator
-    rbegin() const
-    { return _tree.rbegin(); }
+    const_reverse_iterator rbegin() const { return _tree.rbegin(); }
 
-    reverse_iterator
-    rend()
-    { return _tree.rend(); }
+    reverse_iterator rend() { return _tree.rend(); }
 
-    const_reverse_iterator
-    rend() const
-    { return _tree.rend(); }
+    const_reverse_iterator rend() const { return _tree.rend(); }
 
     /// capacity
-    bool
-    empty() const
-    { return _tree.empty(); }
+    bool empty() const { return _tree.empty(); }
 
-    size_type
-    size() const
-    { return _tree.size(); }
+    size_type size() const { return _tree.size(); }
 
-    size_type
-    max_size() const
-    { return _tree.max_size(); }
+    size_type max_size() const { return _tree.max_size(); }
 
     /// modifiers
-    void
-    clear()
-    { _tree.clear(); }
+    void clear() { _tree.clear(); }
 
-    ft::pair<iterator, bool>
-    insert(const value_type& value)
+    ft::pair<iterator, bool> insert(const value_type& value)
     { return _tree.insert(value); }
 
-    iterator
-    insert(iterator hint, const value_type& value)
+    iterator insert(iterator hint, const value_type& value)
     { return _tree.insert(hint, value); }
 
     template <class InputIterator>
-    void
-    insert(InputIterator first, InputIterator last)
+    void insert(InputIterator first, InputIterator last)
     { _tree.insert(first, last); }
 
-    void
-    erase(iterator pos)
+    void erase(iterator pos)
     { _tree.erase(pos); }
 
-    void
-    erase(iterator first, iterator last)
+    void erase(iterator first, iterator last)
     { _tree.erase(first, last); }
 
-    size_type
-    erase(const key_type& key)
+    size_type erase(const key_type& key)
     { return _tree.erase(key); }
 
-    void
-    swap(set& other)
+    void swap(set& other)
     { _tree.swap(other._tree); }
 
     /// lookup
-    size_type
-    count(const Key& key)
+    size_type count(const Key& key)
     { return _tree.count(key); }
 
-    iterator
-    find(const Key& key)
+    iterator find(const Key& key)
     { return _tree.find(key); }
 
-    const_iterator
-    find(const Key& key) const
+    const_iterator find(const Key& key) const
     { return _tree.find(key); }
 
-    ft::pair<iterator, iterator>
-    equal_range(const Key& key)
+    ft::pair<iterator, iterator> equal_range(const Key& key)
     { return _tree.equal_range(key); }
 
-    ft::pair<const_iterator, const_iterator>
-    equal_range(const Key& key) const
+    ft::pair<const_iterator, const_iterator> equal_range(const Key& key) const
     { return _tree.equal_range(key); }
 
-    iterator
-    lower_bound(const Key& key)
+    iterator lower_bound(const Key& key) { return _tree.lower_bound(key); }
+
+    const_iterator lower_bound(const Key& key) const
     { return _tree.lower_bound(key); }
 
-    const_iterator
-    lower_bound(const Key& key) const
-    { return _tree.lower_bound(key); }
+    iterator upper_bound(const Key& key) { return _tree.upper_bound(key); }
 
-    iterator
-    upper_bound(const Key& key)
+    const_iterator upper_bound(const Key& key) const
     { return _tree.upper_bound(key); }
 
-    const_iterator
-    upper_bound(const Key& key) const
-    { return _tree.upper_bound(key); }
+    key_compare key_comp() const { return _tree.key_comp(); }
 
-    key_compare
-    key_comp() const
-    { return _tree.key_comp(); }
-
-    value_compare
-    value_comp() const
-    { return _tree.key_comp(); }
+    value_compare value_comp() const { return _tree.key_comp(); }
 
     /// non-member functions
-    friend bool
-    operator==(const set& lhs, const set& rhs)
+    friend bool operator==(const set& lhs, const set& rhs)
     { return lhs._tree == rhs._tree; }
 
-    friend bool
-    operator!=(const set& lhs, const set& rhs)
+    friend bool operator!=(const set& lhs, const set& rhs)
     { return !(lhs == rhs); }
 
-    friend bool
-    operator<(const set& lhs, const set& rhs)
+    friend bool operator<(const set& lhs, const set& rhs)
     { return lhs._tree < rhs._tree; }
 
-    friend bool
-    operator<=(const set& lhs, const set& rhs)
+    friend bool operator<=(const set& lhs, const set& rhs)
     { return lhs._tree <= rhs._tree; }
 
-    friend bool
-    operator>(const set& lhs, const set& rhs)
+    friend bool operator>(const set& lhs, const set& rhs)
     { return !(lhs <= rhs); }
 
-    friend bool
-    operator>=(const set& lhs, const set& rhs)
+    friend bool operator>=(const set& lhs, const set& rhs)
     { return !(lhs < rhs); }
 
-    friend void
-    swap(set& lhs, set& rhs)
+    friend void swap(set& lhs, set& rhs)
     { lhs.swap(rhs); }
 
 private:
@@ -233,4 +174,4 @@ private:
 
 } // namespace ft
 
-#endif // SET_H_
+#endif // SET_H
