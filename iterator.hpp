@@ -1,7 +1,7 @@
 #ifndef ITERATOR_H
 #define ITERATOR_H
 
-#include <iterator>
+// #include <iterator>
 namespace ft {
 
 using std::input_iterator_tag;
@@ -22,11 +22,14 @@ template <
     class Pointer   = T*,
     class Reference = T&>
 struct iterator {
-    typedef T         value_type;
-    typedef Distance  difference_type;
-    typedef Pointer   pointer;
-    typedef Reference reference;
-    typedef Category  iterator_category;
+    typedef iterator        iterator_type;
+    typedef T               value_type;
+    typedef Distance        difference_type;
+    typedef Pointer         pointer;
+    typedef const Pointer   const_pointer;
+    typedef Reference       reference;
+    typedef const Reference const_reference;
+    typedef Category        iterator_category;
 };
 
 template <class Iter>
@@ -34,7 +37,9 @@ struct iterator_traits {
     typedef typename Iter::difference_type   difference_type;
     typedef typename Iter::value_type        value_type;
     typedef typename Iter::reference         reference;
+    typedef typename Iter::const_reference   const_reference;
     typedef typename Iter::pointer           pointer;
+    typedef typename Iter::const_pointer     const_pointer;
     typedef typename Iter::iterator_category iterator_category;
 };
 
@@ -44,7 +49,9 @@ struct iterator_traits<T*>
     typedef std::ptrdiff_t             difference_type;
     typedef T                          value_type;
     typedef T*                         pointer;
+    typedef const T*                   const_pointer;
     typedef T&                         reference;
+    typedef const T&                   const_reference;
     typedef random_access_iterator_tag iterator_category;
 };
 
@@ -62,11 +69,14 @@ template <class T>
 class ra_iter : public iterator<random_access_iterator_tag, T>
 {
 public:
+    typedef ra_iter                                                             iterator_type;
     typedef typename iterator<random_access_iterator_tag, T>::iterator_category iterator_category;
     typedef typename iterator<random_access_iterator_tag, T>::value_type        value_type;
     typedef typename iterator<random_access_iterator_tag, T>::difference_type   difference_type;
     typedef typename iterator<random_access_iterator_tag, T>::pointer           pointer;
+    typedef typename iterator<random_access_iterator_tag, T>::const_pointer     const_pointer;
     typedef typename iterator<random_access_iterator_tag, T>::reference         reference;
+    typedef typename iterator<random_access_iterator_tag, T>::const_reference   const_reference;
 
     ra_iter() : ptr_(NULL) {}
     ra_iter(pointer ptr) : ptr_(ptr) {}
@@ -136,7 +146,9 @@ public:
     typedef typename iterator_traits<Iter>::value_type          value_type;
     typedef typename iterator_traits<Iter>::difference_type     difference_type;
     typedef typename iterator_traits<Iter>::pointer             pointer;
+    typedef typename iterator_traits<Iter>::const_pointer       const_pointer;
     typedef typename iterator_traits<Iter>::reference           reference;
+    typedef typename iterator_traits<Iter>::const_reference     const_reference;
 
 // Constructors
     reverse_iterator()                                    : it_() {}
@@ -151,7 +163,7 @@ public:
     }
 
 // Dereference
-    reference         operator*() const                   { return *(it_ - 1);     }
+    reference         operator*() const                   { Iter temp(it_); return *--temp; }
     pointer           operator->() const                  { return &(operator*()); }
     reference         operator[](difference_type n) const { return it_[-n - 1];    }
 
