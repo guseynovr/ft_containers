@@ -426,20 +426,20 @@ struct MapDefines
     static const size_t size = _Size;
 };
 
-// typedef std::map<int,int> std_map_int_type;
-// typedef ft::map<int,int> ft_map_int_type;
+typedef std::map<int,int> std_map_int_type;
+typedef ft::map<int,int> ft_map_int_type;
 
-// typedef MapRandomGenerator<std_map_int_type,
-//             IntRandomGenerator,
-//             IntRandomGenerator
-// > smr_gen_type;
+typedef MapRandomGenerator<std_map_int_type,
+            IntRandomGenerator,
+            IntRandomGenerator
+> smr_gen_type;
 
-// typedef MapRandomGenerator<ft_map_int_type,
-//             IntRandomGenerator,
-//             IntRandomGenerator
-// > fmr_gen_type;
+typedef MapRandomGenerator<ft_map_int_type,
+            IntRandomGenerator,
+            IntRandomGenerator
+> fmr_gen_type;
 
-/// set defines
+// set defines
 
 template <typename _Key,
           typename _KeyGenerator = DefaultGenerator<_Key>,
@@ -452,16 +452,16 @@ struct SetDefines
     static const size_t size = _Size;
 };
 
-// typedef std::set<int> std_set_int_type;
-// typedef ft::set<int> ft_set_int_type;
+typedef std::set<int> std_set_int_type;
+typedef ft::set<int> ft_set_int_type;
 
-// typedef SetRandomGenerator<std_set_int_type,
-//             IntRandomGenerator
-// > ssr_gen_type;
+typedef SetRandomGenerator<std_set_int_type,
+            IntRandomGenerator
+> ssr_gen_type;
 
-// typedef SetRandomGenerator<ft_set_int_type,
-//             IntRandomGenerator
-// > fsr_gen_type;
+typedef SetRandomGenerator<ft_set_int_type,
+            IntRandomGenerator
+> fsr_gen_type;
 
 // types lists
 
@@ -492,9 +492,9 @@ MapDefines< int,              float, IntGenerator,          FloatGenerator      
 MapDefines< std::string,      float, StringGenerator,       FloatGenerator      >,
 MapDefines< int,              int,   IntSetRandomGenerator, IntGenerator        >,
 MapDefines< int,              int,   IntRandomGenerator,    IntGenerator        >,
-MapDefines< std::string,      int,   StringRandomGenerator, IntGenerator        >//,
-// MapDefines< std_map_int_type, int,   smr_gen_type,          IntGenerator        >,
-// MapDefines< ft_map_int_type,  int,   fmr_gen_type,          IntGenerator        >
+MapDefines< std::string,      int,   StringRandomGenerator, IntGenerator        >,
+MapDefines< std_map_int_type, int,   smr_gen_type,          IntGenerator        >,
+MapDefines< ft_map_int_type,  int,   fmr_gen_type,          IntGenerator        >
 >
 TestMapTypes;
 
